@@ -61,13 +61,7 @@ class AppxManifest {
           DisplayName="${_config.displayName.toHtmlEscape()}" Square150x150Logo="Images\\Square150x150Logo.png"
           Square44x44Logo="Images\\Square44x44Logo.png" Description="${_config.appDescription.toHtmlEscape()}">
           <uap:DefaultTile ShortName="${_getTileShortName(_config.displayName).toHtmlEscape()}" Square310x310Logo="Images\\LargeTile.png"
-          Square71x71Logo="Images\\SmallTile.png" Wide310x150Logo="Images\\Wide310x150Logo.png">
-            <uap:ShowNameOnTiles>
-              <uap:ShowOn Tile="square150x150Logo"/>
-              <uap:ShowOn Tile="square310x310Logo"/>
-              <uap:ShowOn Tile="wide310x150Logo"/>
-            </uap:ShowNameOnTiles>
-          </uap:DefaultTile>
+            Square71x71Logo="Images\\SmallTile.png" Wide310x150Logo="Images\\Wide310x150Logo.png" />
           <uap:SplashScreen Image="Images\\SplashScreen.png"/>
           <uap:LockScreen BadgeLogo="Images\\BadgeLogo.png" Notification="badge"/>
         </uap:VisualElements>
