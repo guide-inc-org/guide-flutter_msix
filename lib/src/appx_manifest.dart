@@ -167,15 +167,6 @@ class AppxManifest {
         </desktop:Extension>''';
   }
   
-  // TODO:
-  String _getBackgroundTaskExtension() {
-    return '''  <Extension Category="windows.backgroundTasks" EntryPoint="MyBackgroundTask.NotificationTask">
-          <BackgroundTasks>
-            <Task Type="pushNotification" />
-          </BackgroundTasks>
-        </Extension>''';
-  }
-
   String _getComServers() {
     return '''  <com:Extension Category="windows.comServer">
           <com:ComServer>
