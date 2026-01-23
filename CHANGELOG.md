@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.16.13
+
+- Update `get_it` version [#320](https://github.com/YehudaKremer/msix/pull/320)
+
 ## 3.16.12
 
 - add file/folder delete retry to avoid the exists() → delete() race
