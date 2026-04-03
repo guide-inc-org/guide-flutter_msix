@@ -58,6 +58,14 @@ class Configuration {
   bool enableAtStartup = false;
   StartupTask? startupTask;
   Iterable<String>? appUriHandlerHosts;
+
+  // push notification configurations
+  String? pushNotificationCLSID;
+  String pushNotificationWindowsAppRuntimeName =
+      'Microsoft.WindowsAppRuntime.1.8';
+  String pushNotificationWindowsAppRuntimeMinVersion = '8000.770.947.0';
+  String pushNotificationWindowsAppRuntimePublisher =
+      'CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US';
   Iterable<String>? languages;
   String get defaultsIconsFolderPath => p.join(msixAssetsPath, 'icons');
   String get msixToolkitPath =>
@@ -197,6 +205,23 @@ class Configuration {
             !skipContextMenu
         ? ContextMenuConfiguration.fromYaml(contextMenuYaml)
         : null;
+
+    // push notification configurations
+    dynamic pushNotificationYaml = yaml['push_notification'] ?? YamlMap();
+
+    pushNotificationCLSID = pushNotificationYaml['clsid']?.toString();
+    if (pushNotificationYaml['windows_app_runtime_name'] != null) {
+      pushNotificationWindowsAppRuntimeName =
+          pushNotificationYaml['windows_app_runtime_name'].toString();
+    }
+    if (pushNotificationYaml['windows_app_runtime_min_version'] != null) {
+      pushNotificationWindowsAppRuntimeMinVersion =
+          pushNotificationYaml['windows_app_runtime_min_version'].toString();
+    }
+    if (pushNotificationYaml['windows_app_runtime_publisher'] != null) {
+      pushNotificationWindowsAppRuntimePublisher =
+          pushNotificationYaml['windows_app_runtime_publisher'].toString();
+    }
   }
 
   /// Validate the configuration values and set default values

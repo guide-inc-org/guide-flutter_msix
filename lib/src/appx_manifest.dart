@@ -37,7 +37,8 @@ class AppxManifest {
           xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10" 
           xmlns:com2="http://schemas.microsoft.com/appx/manifest/com/windows10/2" 
           xmlns:com3="http://schemas.microsoft.com/appx/manifest/com/windows10/3" 
-          IgnorableNamespaces="uap3 desktop">
+          ${_config.pushNotificationCLSID != null ? 'xmlns:uap17="http://schemas.microsoft.com/appx/manifest/uap/windows10/17"' : ''}
+          IgnorableNamespaces="uap3 desktop${_config.pushNotificationCLSID != null ? ' uap17' : ''}">
     <Identity Name="${_config.identityName}" Version="${_config.msixVersion}"
               Publisher="${_config.publisher!.replaceAll(' = ', '=').toHtmlEscape()}" ProcessorArchitecture="${_config.architecture}" />
     <Properties>
@@ -51,6 +52,7 @@ class AppxManifest {
     </Resources>
     <Dependencies>
       <TargetDeviceFamily Name="Windows.Desktop" MinVersion="${_config.osMinVersion}" MaxVersionTested="10.0.22621.2506" />
+      ${_getPackageDependencies()}
     </Dependencies>
     <Capabilities>
       ${_getCapabilities()}
@@ -83,6 +85,7 @@ class AppxManifest {
         _config.protocolActivation.isNotEmpty ||
         !_config.fileExtension.isNull ||
         !_config.toastActivatorCLSID.isNull ||
+        !_config.pushNotificationCLSID.isNull ||
         (_config.appUriHandlerHosts != null &&
             _config.appUriHandlerHosts!.isNotEmpty) ||
         _config.enableAtStartup ||
@@ -96,7 +99,8 @@ class AppxManifest {
       ${_config.enableAtStartup || _config.startupTask != null ? _getStartupTaskExtension() : ''}
       ${_config.appUriHandlerHosts != null && _config.appUriHandlerHosts!.isNotEmpty ? _getAppUriHandlerHostExtension() : ''}
       ${_config.contextMenuConfiguration != null ? _getContextMenuExtension() : ''}
-      ${_config.contextMenuConfiguration?.comSurrogateServers.isNotEmpty == true || _config.toastActivatorCLSID != null ? _getComServers() : ''}
+      ${!_config.pushNotificationCLSID.isNull ? _getPushNotificationExtension() : ''}
+      ${_config.contextMenuConfiguration?.comSurrogateServers.isNotEmpty == true || _config.toastActivatorCLSID != null || _config.pushNotificationCLSID != null ? _getComServers() : ''}
         </Extensions>''';
     } else {
       return '';
@@ -161,11 +165,25 @@ class AppxManifest {
         </desktop:Extension>''';
   }
 
+  /// Add extension section for push notification
+  String _getPushNotificationExtension() {
+    return '''  <uap17:Extension Category="windows.pushNotification" />''';
+  }
+
+  /// Add PackageDependency entries (e.g. Windows App Runtime for push notification)
+  String _getPackageDependencies() {
+    if (_config.pushNotificationCLSID == null) return '';
+    return '''<PackageDependency Name="${_config.pushNotificationWindowsAppRuntimeName}" MinVersion="${_config.pushNotificationWindowsAppRuntimeMinVersion}" Publisher="${_config.pushNotificationWindowsAppRuntimePublisher}" />''';
+  }
+
   String _getComServers() {
     return '''  <com:Extension Category="windows.comServer">
           <com:ComServer>
              ${_config.toastActivatorCLSID != null ? '''<com:ExeServer Executable="${_config.executableFileName.toHtmlEscape()}" Arguments="${_config.toastActivatorArguments.toHtmlEscape()}" DisplayName="${_config.toastActivatorDisplayName.toHtmlEscape()}">
               <com:Class Id="${_config.toastActivatorCLSID.toHtmlEscape()}"/>
+            </com:ExeServer>''' : ''}
+              ${_config.pushNotificationCLSID != null ? '''<com:ExeServer Executable="${_config.executableFileName.toHtmlEscape()}" Arguments="----WindowsAppRuntimePushServer:" DisplayName="Push notification server">
+              <com:Class Id="${_config.pushNotificationCLSID.toHtmlEscape()}"/>
             </com:ExeServer>''' : ''}
               ${_config.contextMenuConfiguration?.comSurrogateServers.map((item) {
               return '''<com:SurrogateServer DisplayName="Context menu verb handler">
