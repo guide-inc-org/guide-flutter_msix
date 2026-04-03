@@ -82,8 +82,14 @@ class SignTool {
 
   Future<ProcessResult> _executePowershellCommand(String command) async =>
       await Process.run(
-          'powershell.exe', ['-NoProfile', '-NonInteractive', command],
-          stdoutEncoding: utf8, stderrEncoding: utf8)
+          'powershell.exe',
+          [
+            '-NoProfile',
+            '-NonInteractive',
+            '[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; $command'
+          ],
+          stdoutEncoding: utf8,
+          stderrEncoding: utf8)
         ..exitOnError();
 
   Future<String> _getInstalledCertificateSubject(String searchCondition) async {
